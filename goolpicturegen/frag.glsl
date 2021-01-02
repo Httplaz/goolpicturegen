@@ -75,23 +75,10 @@ vec3 hsv2rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
-void main()
+float func2(float x, float y, int a, int b)
 {
-	vec2 texCoord = vec2(gl_FragCoord.x/float(windowSize.x), gl_FragCoord.y/float(windowSize.y));
-    vec4 pixel = texture2D(texture, texCoord);
-	//vec4 pixel = vec4(0.8,0.5,0.4,1);
-	float sx = textureSize(texture, 0).x;
-	float sy = textureSize(texture, 0).y;
-	vec2 pixelPos = vec2((texCoord.x-0.5)*resolution.x, (texCoord.y-0.5)*resolution.y);
-	float x = pixelPos.x*scale.x;
-	float y = pixelPos.y*scale.y;
-	x+=camPos.x;
-	y-=camPos.y;
-
-
 	float z = 1;
-
-	for (int i=0; i<formuleLength; i++)
+	for (int i=a; i<b; i++)
 	{
 		int action = int(texture2D(formule, vec2(1.0f/formuleLength*i, 1)).x*255);
 		//action = 100;
@@ -161,8 +148,146 @@ void main()
 			case 20:
 			z*= (int(z) % int(y));
 			break;
+			case 21:
+			//float pz = func(x, y, i+1, formuleLength);
+			break;
+			case 22:
+			//y*=func(x, y, i+1, formuleLength);
+			break;
+			case 23:
+			//x*=func(z, y, i+1, formuleLength);
+			break;
+			case 24:
+			//y*=func(x, z, i+1, formuleLength);
+			break;
+			case 25:
+			z*= (~ int(y));
+			break;
+			case 26:
+			z*= (~ int(x));
+			break;
+			case 27:
+			z*= (~ int(y));
 		}
 	}
+	return z;
+}
+
+float func(float x, float y, int a, int b)
+{
+	float z = 1;
+	for (int i=a; i<b; i++)
+	{
+		int action = int(texture2D(formule, vec2(1.0f/formuleLength*i, 1)).x*255);
+		//action = 100;
+		//tz = action;
+		switch(action)
+		{
+			case 0:
+			z*=x;
+			break;
+			case 1:
+			z*=y;
+			break;
+			case 2:
+			z*=abs(x-y);
+			break;
+			case 3:
+			z*= sin(x*pi);
+			break;
+			case 4:
+			z*= sin(y*pi);
+			break;
+			case 5:
+			z*= cos(x*pi);
+			break;
+			case 6:
+			z*= cos(y*pi);
+			break;
+			case 7:
+			z*= tan(x*pi);
+			break;
+			case 8:
+			z*= tan(y*pi);
+			break;
+			case 9:
+			z*= (int(x) & int(y));
+			break;
+			case 10:
+			z*= (int(z) & int(x));
+			break;
+			case 11:
+			z*= (int(z) & int(y));
+			break;
+			case 12:
+			z*= (int(x) ^ int(y));
+			break;
+			case 13:
+			z*= (int(z) ^ int(x));
+			break;
+			case 14:
+			z*= (int(z) ^ int(y));
+			break;
+			case 15:
+			z*= (int(x) | int(y));
+			break;
+			case 16:
+			z*= (int(z) | int(x));
+			break;
+			case 17:
+			z*= (int(z) | int(y));
+			break;
+			case 18:
+			z*= (int(x) % int(y));
+			break;
+			case 19:
+			z*= (int(z) % int(x));
+			break;
+			case 20:
+			z*= (int(z) % int(y));
+			break;
+			case 21:
+			x*=func2(x, y, i+1, formuleLength);
+			break;
+			case 22:
+			y*=func2(x, y, i+1, formuleLength);
+			break;
+			case 23:
+			x*=func2(z, y, i+1, formuleLength);
+			break;
+			case 24:
+			y*=func2(x, z, i+1, formuleLength);
+			break;
+			case 25:
+			z*= (~ int(y));
+			break;
+			case 26:
+			z*= (~ int(x));
+			break;
+			case 27:
+			z*= (~ int(y));
+		}
+	}
+	return z;
+}
+
+void main()
+{
+	vec2 texCoord = vec2(gl_FragCoord.x/float(windowSize.x), gl_FragCoord.y/float(windowSize.y));
+    vec4 pixel = texture2D(texture, texCoord);
+	//vec4 pixel = vec4(0.8,0.5,0.4,1);
+	float sx = textureSize(texture, 0).x;
+	float sy = textureSize(texture, 0).y;
+	vec2 pixelPos = vec2((texCoord.x-0.5)*resolution.x, (texCoord.y-0.5)*resolution.y);
+	float x = pixelPos.x*scale.x;
+	float y = pixelPos.y*scale.y;
+	x+=camPos.x;
+	y-=camPos.y;
+
+
+	float z = 1;
+
+	z = func(x, y, 0, formuleLength);
 
 	pixel.xy = pixelPos;
 	int fz = int(z)%360;

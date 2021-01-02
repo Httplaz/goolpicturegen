@@ -5,7 +5,7 @@
 using namespace std;
 using namespace sf;
 
-int fsx = 200, fsy = 200, sx = 400, sy = 400, fl = 4, fb = 9, mfb = 21, mfl = 40;
+int fsx = 200, fsy = 200, sx = 400, sy = 400, fl = 4, fb = 9, mfb = 28, mfl = 6;
 float scx = 1, scy = 1;
 float camX = fsx/2, camY = fsy/2;
 bool randomFB = true;
